@@ -3,6 +3,21 @@ import threading
 
 open_ports = []
 
+def grabbing(targe, por, menu):
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(2)
+        sock.connect((targe, por))
+        sock.send(b"HEAD / HTTP/1.1\r\nHost: %s\r\n\r\n" % targe.encode())
+
+        banner = sock.recv(1024).decode(errors='ignore')
+        with open(f"{menu}.txt", "a") as f:
+            f.write(f"{banner}\n")
+        print("Баннер:\n", banner)
+        sock.close()
+    except Exception as e:
+        print(e)
+
 def scan_range_threaded(start_port, end_port):
     threads = []
     for port in range(start_port, end_port + 1):
@@ -21,7 +36,7 @@ def udp(target, start_port, end_port):
             data, server = sock.recvfrom(1024)
             with open(f"{menu}.txt", "a") as f:
                 f.write(f"Udp {port}: ответ получен\n")
-            print(f"Порт{port}: Открыт")
+            print(f"Порт {port}: Открыт")
             open_ports.append(port)
         except socket.timeout:
             pass
@@ -48,7 +63,7 @@ def scan_port(port):
     except socket.error as e:
         pass
 
-print("Это меню\nНажми (1) для сканирования новой цели\nНажми (2) для выхода")
+print("Это меню\nНажми (1) для сканирования новой цели\nНажми (2) для выхода\nНажми (3) для Banner grabbing")
 sel = input(": ")
 if sel == "1":
     menu = input("Name: ")
@@ -60,17 +75,22 @@ if sel == "1":
     target = x
     start_port = a
     end_port = b
+
+    protocol = input("Протокол tcp или udp: ").lower()
+    if protocol == "tcp":
+        print(f"Сканирование tcp  портов {target} от {start_port} до {end_port}...")
+        scan_range_threaded(start_port, end_port)
+        print(f"Сканирование завершено и сохранено в файл {menu}")
+    elif protocol == "udp":
+        print(f"Сканирование udp портов {target} от {start_port} до {end_port}...")
+        udp(target, start_port, end_port)
+    else:
+        print("Неверный выбор")
 elif sel == "2":
         print("Exit...")
         exit()
-
-protocol = input("Протокол tcp или udp: ").lower()
-if protocol == "tcp":
-    print(f"Сканирование tcp  портов {target} от {start_port} до {end_port}...")
-    scan_range_threaded(start_port, end_port)
-    print(f"Сканирование завершено и сохранено в файл {menu}")
-elif protocol == "udp":
-    print(f"Сканирование udp портов {target} от {start_port} до {end_port}...")
-    udp(target, start_port, end_port)
-else:
-    print("Неверный выбор")
+elif sel == "3":
+    menu = input("Name: ")
+    targe = input("Введи ip цели: ")
+    por = int(input("Введи порт цели: "))
+    grabbing(targe, por, menu)
