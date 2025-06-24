@@ -12,4 +12,4 @@
 ##В скором времени
 
 1. Поддержка UDP (сделано)
-2. Banner grabbing
+2. Banner grabbing (сделано)
