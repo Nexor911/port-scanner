@@ -36,8 +36,9 @@ def udp(target, start_port, end_port):
             data, server = sock.recvfrom(1024)
             with open(f"{menu}.txt", "a") as f:
                 f.write(f"Udp {port}: ответ получен\n")
-            print(f"Порт {port}: Открыт")
             open_ports.append(port)
+            if not quiet:
+                print(f"Порт {port}: Открыт")
         except socket.timeout:
             pass
         except Exception as e:
@@ -56,7 +57,9 @@ def scan_port(port):
         sock.settimeout(5)
         result = sock.connect_ex((target, port))
         if result == 0:
-            print(f"Port {port}: Open")
+            open_ports.append(port)
+            if not quiet:
+                print(f"Port {port}: Open")
             with open(f"{menu}.txt", "a") as f:
                 f.write(f"Порт {port}: Открыт\n")
         sock.close()
@@ -69,6 +72,7 @@ if sel == "1":
     menu = input("Name: ")
     with open(f"{menu}.txt", "w") as f:
         f.close()
+    quiet = input("Включить тихий режим? (y/n): ").lower() == "y"
     x = input("введите айпи адрес: ")
     a = int(input("стартовый порт: "))
     b = int(input("конечный порт: "))
