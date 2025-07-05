@@ -3,6 +3,14 @@ import threading
 
 open_ports = []
 
+list = """
+_________________________
+|>_ root@localhost:~    |
+|                       |
+|  Starting scan...     |
+|_______________________|
+"""
+
 def grabbing(targe, por, menu):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -82,10 +90,12 @@ if sel == "1":
 
     protocol = input("Протокол tcp или udp: ").lower()
     if protocol == "tcp":
+        print(list)
         print(f"Сканирование tcp  портов {target} от {start_port} до {end_port}...")
         scan_range_threaded(start_port, end_port)
         print(f"Сканирование завершено и сохранено в файл {menu}")
     elif protocol == "udp":
+        print(list)
         print(f"Сканирование udp портов {target} от {start_port} до {end_port}...")
         udp(target, start_port, end_port)
     else:
